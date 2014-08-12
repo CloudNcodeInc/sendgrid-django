@@ -4,7 +4,7 @@ execfile('sgbackend/version.py')
 
 setup(
     name='sendgrid-django',
-    version=str(__version__),
+    version='0.0.1',
     author='Yamil Asusta',
     author_email='yamil@sendgrid.com',
     url='https://github.com/elbuo8/sendgrid-django',
