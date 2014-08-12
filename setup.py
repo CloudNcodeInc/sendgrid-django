@@ -1,7 +1,5 @@
 from setuptools import setup, find_packages
 
-execfile('sgbackend/version.py')
-
 setup(
     name='sendgrid-django',
     version='0.0.1',
