@@ -22,7 +22,7 @@ def build_sengrid_mail(email, check=True, fail=True):
     mail.set_subject(email.subject)
     mail.set_from(email.from_email)
 
-    text, html = '', email.body if email.content_subtype == 'html' else email.body, ''
+    text, html = ('', email.body) if email.content_subtype == 'html' else (email.body, '')
     if not html and hasattr(email, 'alternatives'):
         try:
             html = next(c for c, t in email.alternatives if t == 'text/html')
