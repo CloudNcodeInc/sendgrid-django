@@ -24,6 +24,7 @@ Add the following to your project’s **settings.py**:
     EMAIL_BACKEND = "sgbackend.SendGridBackend"
     SENDGRID_USER = "Your SendGrid Username"
     SENDGRID_PASSWORD = "Your SendGrid Password"
+    SENDGRID_RAISE_UNHANDLED = True
 
 **Done!**
 

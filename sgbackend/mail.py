@@ -3,7 +3,6 @@
 import sendgrid
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.core.mail import EmailMultiAlternatives
 from django.core.mail.backends.base import BaseEmailBackend
 from email.mime.base import MIMEBase
 try:
@@ -11,15 +10,23 @@ try:
 except Exception as e:
     import email.utils as rfc822
 
+from . import exceptions
+
+__all__ = ('HANDLED_CONTENT_TYPES', 'SendGridBackend')
+
+HANDLED_CONTENT_TYPES = {'text/html', 'text/plain'}
+
 
 class SendGridBackend(BaseEmailBackend):
     """
     Email back-end using SendGrid Web API
     """
+
     def __init__(self, fail_silently=False, **kwargs):
         super(SendGridBackend, self).__init__(fail_silently=fail_silently, **kwargs)
         self.api_user = getattr(settings, 'SENDGRID_USER', None)
         self.api_key = getattr(settings, 'SENDGRID_PASSWORD', None)
+        self.raise_unhandled = getattr(settings, 'SENDGRID_RAISE_UNHANDLED', False)
         if self.api_user is None or self.api_key is None:
             raise ImproperlyConfigured('Either SENDGRID_USER or SENDGRID_PASSWORD was not declared in settings.py')
         self.sendgrid = sendgrid.SendGridClient(self.api_user, self.api_key, raise_errors=not fail_silently)
@@ -52,11 +59,18 @@ class SendGridBackend(BaseEmailBackend):
         mail.set_from(email.from_email)
 
         text, html = '', email.body if email.content_subtype == 'html' else email.body, ''
-        if not html and isinstance(email, EmailMultiAlternatives):
-            try:
-                html = next(c for c, t in email.alternatives if t == 'text/html')
-            except StopIteration:
-                pass
+        if hasattr(email, 'alternatives'):
+            if self.raise_unhandled:
+                unhandled_types = [t for c, t in email.alternatives if t not in HANDLED_CONTENT_TYPES]
+                if unhandled_types:
+                    raise exceptions.SendGridUnhandledContentTypeError(
+                        "SendGrid API don't handle content of type(s) {0}".format(unhandled_types)
+                    )
+            if not html:
+                try:
+                    html = next(c for c, t in email.alternatives if t == 'text/html')
+                except StopIteration:
+                    pass
         mail.set_text(text)
         mail.set_html(html)
 
