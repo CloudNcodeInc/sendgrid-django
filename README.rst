@@ -1,7 +1,12 @@
 SendGrid-django
 ===============
 
-Simple django backend to send email using SendGrid’s Web API.
+Simple Django back-end to send email using SendGrid’s Web API.
+
+**Warning**:
+
+Sendgrid API only handles plain text and HTML type of content.
+Any e-mail alternative content with an unhanded type of content will be dropped!
 
 Installation
 ------------
