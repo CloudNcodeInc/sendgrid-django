@@ -1,3 +1,4 @@
+from codecs import open
 from setuptools import setup, find_packages
 
 setup(
@@ -9,6 +10,6 @@ setup(
     packages=find_packages(),
     license='MIT',
     description='SendGrid Backend for Django',
-    long_description=open('./README.rst').read(),
+    long_description=open('./README.rst', encoding='utf-8').read(),
     install_requires=["sendgrid==0.5.1"],
 )
