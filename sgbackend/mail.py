@@ -48,7 +48,7 @@ class SendGridBackend(BaseEmailBackend):
         count = 0
         for email in emails:
             try:
-                self.sendgrid.send(utils.build_sengrid_mail(email, check=self.raise_unhandled))
+                self.sg.send(utils.build_sengrid_mail(email, check=self.raise_unhandled))
                 count += 1
             except sendgrid.SendGridError:
                 if not self.fail_silently:
