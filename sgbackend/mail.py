@@ -13,18 +13,26 @@ __all__ = ('SendGridBackend', )
 
 
 class SendGridBackend(BaseEmailBackend):
-    """
-    Email back-end using SendGrid Web API
-    """
+    """Email back-end using SendGrid Web API"""
 
     def __init__(self, fail_silently=False, **kwargs):
-        super(SendGridBackend, self).__init__(fail_silently=fail_silently, **kwargs)
+        super(SendGridBackend, self).__init__(
+            fail_silently=fail_silently, **kwargs)
+        self.api_key = getattr(settings, 'SENDGRID_API_KEY', None)
         self.api_user = getattr(settings, 'SENDGRID_USER', None)
-        self.api_key = getattr(settings, 'SENDGRID_PASSWORD', None)
+        self.api_password = getattr(settings, 'SENDGRID_PASSWORD', None)
         self.raise_unhandled = getattr(settings, 'SENDGRID_RAISE_UNHANDLED', False)
-        if self.api_user is None or self.api_key is None:
-            raise ImproperlyConfigured('Either SENDGRID_USER or SENDGRID_PASSWORD was not declared in settings.py')
-        self.sendgrid = sendgrid.SendGridClient(self.api_user, self.api_key, raise_errors=not fail_silently)
+
+        credentials = []
+        if self.api_key:
+            credentials.append(self.api_key)
+        elif self.api_user and self.api_password:
+            credentials.append(self.api_user)
+            credentials.append(self.api_password)
+        else:
+            raise ImproperlyConfigured('Either SENDGRID_API_KEY or both (SENDGRID_USER and SENDGRID_PASSWORD) '
+                                       'must be declared in settings.py')
+        self.sg = sendgrid.SendGridClient(*credentials, raise_errors=not fail_silently)
 
     def open(self):
         pass

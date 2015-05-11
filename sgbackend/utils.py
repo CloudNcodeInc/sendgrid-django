@@ -19,6 +19,8 @@ def build_sengrid_mail(email, check=True, fail=True):
 
     mail = sendgrid.Mail()
     mail.add_to(email.to)
+    mail.add_cc(email.cc)
+    mail.add_bcc(email.bcc)
     mail.set_subject(email.subject)
     mail.set_from(email.from_email)
 
@@ -33,7 +35,9 @@ def build_sengrid_mail(email, check=True, fail=True):
 
     for attachment in email.attachments:
         if isinstance(attachment, MIMEBase):
-            mail.add_attachment_stream(attachment.get_filename(), attachment.get_payload())
+            mail.add_attachment_stream(
+                attachment.get_filename(),
+                attachment.get_payload())
         elif isinstance(attachment, tuple):
             mail.add_attachment_stream(attachment[0], attachment[1])
 
@@ -60,7 +64,7 @@ def build_sengrid_mail(email, check=True, fail=True):
         for attachment in email.attachments:
             mail.add_attachment_stream(attachment[0], attachment[1])
 
-    return mail
+        return mail
 
 
 def is_handled(email, fail=True):
