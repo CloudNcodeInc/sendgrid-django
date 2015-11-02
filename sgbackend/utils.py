@@ -64,7 +64,7 @@ def build_sengrid_mail(email, check=True, fail=True):
         for attachment in email.attachments:
             mail.add_attachment_stream(attachment[0], attachment[1])
 
-        return mail
+    return mail
 
 
 def is_handled(email, fail=True):
